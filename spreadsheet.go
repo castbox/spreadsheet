@@ -14,6 +14,8 @@ type Spreadsheet struct {
 
 	service *Service
 	cached  bool
+	// raw is api response data
+	raw []byte
 }
 
 // UnmarshalJSON embeds spreadsheet to sheets.
@@ -64,3 +66,5 @@ func (spreadsheet *Spreadsheet) SheetByTitle(title string) (sheet *Sheet, err er
 	err = errors.New("sheet not found by the title")
 	return
 }
+
+func (spreadsheet *Spreadsheet) GetRawData() []byte { return spreadsheet.raw }

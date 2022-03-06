@@ -125,6 +125,7 @@ func (s *Service) FetchSpreadsheet(id string, options ...FetchSpreadsheetOption)
 		return
 	}
 	spreadsheet.service = s
+	spreadsheet.raw = body
 
 	if config.cacheInterval > 0 {
 		config.cachedSpreadsheet = spreadsheet
