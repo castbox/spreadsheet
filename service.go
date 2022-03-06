@@ -2,6 +2,7 @@ package spreadsheet
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -10,7 +11,6 @@ import (
 	"sync"
 	"time"
 
-	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
 
@@ -37,7 +37,7 @@ func NewService() (s *Service, err error) {
 		return
 	}
 
-	s = NewServiceWithClient(conf.Client(oauth2.NoContext))
+	s = NewServiceWithClient(conf.Client(context.TODO()))
 	return
 }
 
@@ -108,7 +108,7 @@ func (s *Service) FetchSpreadsheet(id string, options ...FetchSpreadsheetOption)
 		o(&config)
 	}
 
-	if config.cacheInterval > 0 && time.Now().Sub(config.lastCachedAt.Add(config.cacheInterval)) <= 0 {
+	if config.cacheInterval > 0 && time.Since(config.lastCachedAt.Add(config.cacheInterval)) <= 0 {
 		// use cache
 		return config.cachedSpreadsheet, nil
 	}
@@ -279,16 +279,19 @@ func (s *Service) post(path string, params map[string]interface{}) (body string,
 	if err != nil {
 		return
 	}
-	bytes, err := ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
 	if err != nil {
 		return
 	}
-	err = s.checkError(bytes)
+	err = s.checkError(data)
 	if err != nil {
 		return
 	}
-	body = string(bytes)
+	body = string(data)
 	return
 }
 
