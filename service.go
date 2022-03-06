@@ -47,7 +47,7 @@ func NewServiceWithClient(client *http.Client) *Service {
 		baseURL:                  baseURL,
 		client:                   client,
 		m:                        new(sync.RWMutex),
-		configForSpreadsheetByID: make(map[string]spreadsheetConfig, 0),
+		configForSpreadsheetByID: make(map[string]spreadsheetConfig),
 	}
 }
 
@@ -61,7 +61,7 @@ type Service struct {
 }
 
 // CreateSpreadsheet creates a spreadsheet with the given title
-func (s *Service) CreateSpreadsheet(spreadsheet Spreadsheet) (resp Spreadsheet, err error) {
+func (s *Service) CreateSpreadsheet(spreadsheet Spreadsheet) (resp *Spreadsheet, err error) {
 	sheets := make([]map[string]interface{}, 1)
 	for s := range spreadsheet.Sheets {
 		sheet := spreadsheet.Sheets[s]
@@ -86,7 +86,7 @@ func (s *Service) CreateSpreadsheet(spreadsheet Spreadsheet) (resp Spreadsheet, 
 type spreadsheetConfig struct {
 	cacheInterval     time.Duration
 	lastCachedAt      time.Time
-	cachedSpreadsheet Spreadsheet
+	cachedSpreadsheet *Spreadsheet
 }
 
 // FetchSpreadsheetOption is the option for FetchSpreadsheet function
@@ -100,7 +100,7 @@ func WithCache(interval time.Duration) FetchSpreadsheetOption {
 }
 
 // FetchSpreadsheet fetches the spreadsheet by the id.
-func (s *Service) FetchSpreadsheet(id string, options ...FetchSpreadsheetOption) (spreadsheet Spreadsheet, err error) {
+func (s *Service) FetchSpreadsheet(id string, options ...FetchSpreadsheetOption) (spreadsheet *Spreadsheet, err error) {
 	s.m.RLock()
 	config := s.configForSpreadsheetByID[id]
 	s.m.RUnlock()

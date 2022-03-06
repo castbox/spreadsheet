@@ -107,7 +107,7 @@ func (suite *TestSuite) TestFetchSpreadsheetWithCache() {
 func (suite *TestSuite) TestAdd_DeleteSheet() {
 	spreadsheet, err := suite.service.FetchSpreadsheet(spreadsheetID)
 	suite.Require().NoError(err)
-	err = suite.service.AddSheet(&spreadsheet, SheetProperties{
+	err = suite.service.AddSheet(spreadsheet, SheetProperties{
 		Title: "TestAddedSheet",
 		Index: 1,
 	})
@@ -116,7 +116,7 @@ func (suite *TestSuite) TestAdd_DeleteSheet() {
 	sheet, err := spreadsheet.SheetByTitle("TestAddedSheet")
 	suite.Require().NoError(err)
 
-	err = suite.service.DeleteSheet(&spreadsheet, sheet.Properties.ID)
+	err = suite.service.DeleteSheet(spreadsheet, sheet.Properties.ID)
 	suite.Require().NoError(err)
 }
 
