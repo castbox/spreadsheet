@@ -1,6 +1,7 @@
 package spreadsheet
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -24,7 +25,7 @@ func (suite *TestSuite) SetupSuite() {
 
 func (suite *TestSuite) TestCreateSpreadsheet() {
 	title := "testspreadsheet"
-	spreadsheet, err := suite.service.CreateSpreadsheet(Spreadsheet{
+	spreadsheet, err := suite.service.CreateSpreadsheet(context.TODO(), Spreadsheet{
 		Properties: Properties{
 			Title: title,
 		},
@@ -38,7 +39,7 @@ func (suite *TestSuite) TestCreateSpreadsheet() {
 func (suite *TestSuite) TestCreateSpreadsheetWithSheets() {
 	title := "testspreadsheet"
 	sheetTitles := []string{"sheet 1", "sheet 2"}
-	spreadsheet, err := suite.service.CreateSpreadsheet(Spreadsheet{
+	spreadsheet, err := suite.service.CreateSpreadsheet(context.TODO(), Spreadsheet{
 		Properties: Properties{
 			Title: title,
 		},
@@ -66,7 +67,7 @@ func (suite *TestSuite) TestCreateSpreadsheetWithSheets() {
 }
 
 func (suite *TestSuite) TestFetchSpreadsheet() {
-	spreadsheet, err := suite.service.FetchSpreadsheet(spreadsheetID)
+	spreadsheet, err := suite.service.FetchSpreadsheet(context.TODO(), spreadsheetID)
 	suite.Require().NoError(err)
 	suite.Equal(spreadsheetID, spreadsheet.ID)
 	suite.Require().Equal(2, len(spreadsheet.Sheets))
@@ -96,18 +97,18 @@ func (suite *TestSuite) TestFetchSpreadsheet() {
 }
 
 func (suite *TestSuite) TestFetchSpreadsheetWithCache() {
-	spreadsheet1, err := suite.service.FetchSpreadsheet(spreadsheetID, WithCache(3*time.Second))
+	spreadsheet1, err := suite.service.FetchSpreadsheet(context.TODO(), spreadsheetID, WithCache(3*time.Second))
 	suite.Require().NoError(err)
 	suite.False(spreadsheet1.cached)
-	spreadsheet2, err := suite.service.FetchSpreadsheet(spreadsheetID)
+	spreadsheet2, err := suite.service.FetchSpreadsheet(context.TODO(), spreadsheetID)
 	suite.Require().NoError(err)
 	suite.True(spreadsheet2.cached)
 }
 
 func (suite *TestSuite) TestAdd_DeleteSheet() {
-	spreadsheet, err := suite.service.FetchSpreadsheet(spreadsheetID)
+	spreadsheet, err := suite.service.FetchSpreadsheet(context.TODO(), spreadsheetID)
 	suite.Require().NoError(err)
-	err = suite.service.AddSheet(spreadsheet, SheetProperties{
+	err = suite.service.AddSheet(context.TODO(), spreadsheet, SheetProperties{
 		Title: "TestAddedSheet",
 		Index: 1,
 	})
@@ -116,12 +117,12 @@ func (suite *TestSuite) TestAdd_DeleteSheet() {
 	sheet, err := spreadsheet.SheetByTitle("TestAddedSheet")
 	suite.Require().NoError(err)
 
-	err = suite.service.DeleteSheet(spreadsheet, sheet.Properties.ID)
+	err = suite.service.DeleteSheet(context.TODO(), spreadsheet, sheet.Properties.ID)
 	suite.Require().NoError(err)
 }
 
 func (suite *TestSuite) TestSyncSheet() {
-	spreadsheet, err := suite.service.FetchSpreadsheet(spreadsheetID)
+	spreadsheet, err := suite.service.FetchSpreadsheet(context.TODO(), spreadsheetID)
 	suite.Require().NoError(err)
 	sheet, err := spreadsheet.SheetByTitle("TestSheet")
 	suite.Require().NoError(err)
@@ -131,7 +132,7 @@ func (suite *TestSuite) TestSyncSheet() {
 }
 
 func (suite *TestSuite) TestDeleteRows() {
-	spreadsheet, err := suite.service.FetchSpreadsheet(spreadsheetID)
+	spreadsheet, err := suite.service.FetchSpreadsheet(context.TODO(), spreadsheetID)
 	suite.Require().NoError(err)
 	sheet, err := spreadsheet.SheetByTitle("TestSheet2")
 	suite.Require().NoError(err)

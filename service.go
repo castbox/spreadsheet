@@ -61,7 +61,7 @@ type Service struct {
 }
 
 // CreateSpreadsheet creates a spreadsheet with the given title
-func (s *Service) CreateSpreadsheet(spreadsheet Spreadsheet) (resp *Spreadsheet, err error) {
+func (s *Service) CreateSpreadsheet(ctx context.Context, spreadsheet Spreadsheet) (resp *Spreadsheet, err error) {
 	sheets := make([]map[string]interface{}, 1)
 	for s := range spreadsheet.Sheets {
 		sheet := spreadsheet.Sheets[s]
@@ -80,7 +80,7 @@ func (s *Service) CreateSpreadsheet(spreadsheet Spreadsheet) (resp *Spreadsheet,
 	if err != nil {
 		return
 	}
-	return s.FetchSpreadsheet(resp.ID)
+	return s.FetchSpreadsheet(ctx, resp.ID)
 }
 
 type spreadsheetConfig struct {
@@ -100,7 +100,7 @@ func WithCache(interval time.Duration) FetchSpreadsheetOption {
 }
 
 // FetchSpreadsheet fetches the spreadsheet by the id.
-func (s *Service) FetchSpreadsheet(id string, options ...FetchSpreadsheetOption) (spreadsheet *Spreadsheet, err error) {
+func (s *Service) FetchSpreadsheet(ctx context.Context, id string, options ...FetchSpreadsheetOption) (spreadsheet *Spreadsheet, err error) {
 	s.m.RLock()
 	config := s.configForSpreadsheetByID[id]
 	s.m.RUnlock()
@@ -116,7 +116,7 @@ func (s *Service) FetchSpreadsheet(id string, options ...FetchSpreadsheetOption)
 	fields := "spreadsheetId,properties.title,sheets(properties,data.rowData.values(formattedValue,note))"
 	fields = url.QueryEscape(fields)
 	path := fmt.Sprintf("/spreadsheets/%s?fields=%s", id, fields)
-	body, err := s.get(path)
+	body, err := s.get(ctx, path)
 	if err != nil {
 		return
 	}
@@ -139,8 +139,8 @@ func (s *Service) FetchSpreadsheet(id string, options ...FetchSpreadsheetOption)
 }
 
 // ReloadSpreadsheet reloads the spreadsheet
-func (s *Service) ReloadSpreadsheet(spreadsheet *Spreadsheet) (err error) {
-	newSpreadsheet, err := s.FetchSpreadsheet(spreadsheet.ID)
+func (s *Service) ReloadSpreadsheet(ctx context.Context, spreadsheet *Spreadsheet) (err error) {
+	newSpreadsheet, err := s.FetchSpreadsheet(ctx, spreadsheet.ID)
 	if err != nil {
 		return
 	}
@@ -150,7 +150,7 @@ func (s *Service) ReloadSpreadsheet(spreadsheet *Spreadsheet) (err error) {
 }
 
 // AddSheet adds a sheet
-func (s *Service) AddSheet(spreadsheet *Spreadsheet, sheetProperties SheetProperties) (err error) {
+func (s *Service) AddSheet(ctx context.Context, spreadsheet *Spreadsheet, sheetProperties SheetProperties) (err error) {
 	r, err := newUpdateRequest(spreadsheet)
 	if err != nil {
 		return
@@ -159,12 +159,12 @@ func (s *Service) AddSheet(spreadsheet *Spreadsheet, sheetProperties SheetProper
 	if err != nil {
 		return
 	}
-	err = s.ReloadSpreadsheet(spreadsheet)
+	err = s.ReloadSpreadsheet(ctx, spreadsheet)
 	return
 }
 
 // DuplicateSheet duplicates the contents of a sheet
-func (s *Service) DuplicateSheet(spreadsheet *Spreadsheet, sheet *Sheet, index int, title string) (err error) {
+func (s *Service) DuplicateSheet(ctx context.Context, spreadsheet *Spreadsheet, sheet *Sheet, index int, title string) (err error) {
 	r, err := newUpdateRequest(spreadsheet)
 	if err != nil {
 		return
@@ -173,12 +173,12 @@ func (s *Service) DuplicateSheet(spreadsheet *Spreadsheet, sheet *Sheet, index i
 	if err != nil {
 		return
 	}
-	err = s.ReloadSpreadsheet(spreadsheet)
+	err = s.ReloadSpreadsheet(ctx, spreadsheet)
 	return
 }
 
 // DeleteSheet deletes the sheet
-func (s *Service) DeleteSheet(spreadsheet *Spreadsheet, sheetID uint) (err error) {
+func (s *Service) DeleteSheet(ctx context.Context, spreadsheet *Spreadsheet, sheetID uint) (err error) {
 	r, err := newUpdateRequest(spreadsheet)
 	if err != nil {
 		return
@@ -187,7 +187,7 @@ func (s *Service) DeleteSheet(spreadsheet *Spreadsheet, sheetID uint) (err error
 	if err != nil {
 		return
 	}
-	err = s.ReloadSpreadsheet(spreadsheet)
+	err = s.ReloadSpreadsheet(ctx, spreadsheet)
 	return
 }
 
@@ -257,8 +257,12 @@ func (s *Service) DeleteColumns(sheet *Sheet, start, end int) (err error) {
 	return
 }
 
-func (s *Service) get(path string) (body []byte, err error) {
-	resp, err := s.client.Get(baseURL + path)
+func (s *Service) get(ctx context.Context, path string) (body []byte, err error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, baseURL+path, nil)
+	if err != nil {
+		return
+	}
+	resp, err := s.client.Do(req)
 	if err != nil {
 		return
 	}
