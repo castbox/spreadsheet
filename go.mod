@@ -1,4 +1,4 @@
-module github.com/avtion/spreadsheet
+module github.com/triphop/spreadsheet
 
 go 1.17
 
