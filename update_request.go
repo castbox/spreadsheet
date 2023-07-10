@@ -178,6 +178,17 @@ func (r *updateRequest) UpdateCells(sheet *Sheet) *updateRequest {
 				values["userEnteredValue"] = map[string]string{
 					cellValueType(cell.Value): cell.Value,
 				}
+			case "userEnteredFormat":
+				if cell.UserEnteredFormat != nil && cell.UserEnteredFormat.BackgroundColor != nil {
+					values["userEnteredFormat"] = map[string]interface{}{
+						"backgroundColor": map[string]float64{
+							"alpha": cell.UserEnteredFormat.BackgroundColor.Alpha,
+							"red":   cell.UserEnteredFormat.BackgroundColor.Red / 255,
+							"green": cell.UserEnteredFormat.BackgroundColor.Green / 255,
+							"blue":  cell.UserEnteredFormat.BackgroundColor.Blue / 255,
+						},
+					}
+				}
 			case "note":
 				values["note"] = cell.Note
 			}

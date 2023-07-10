@@ -1,13 +1,18 @@
 package spreadsheet
 
-import "fmt"
+import (
+	"fmt"
+
+	"google.golang.org/api/sheets/v4"
+)
 
 // Cell describes a cell data
 type Cell struct {
-	Row    uint
-	Column uint
-	Value  string
-	Note   string
+	Row               uint
+	Column            uint
+	Value             string
+	Note              string
+	UserEnteredFormat *sheets.CellFormat
 
 	modifiedFields string
 }

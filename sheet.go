@@ -3,6 +3,8 @@ package spreadsheet
 import (
 	"encoding/json"
 	"strings"
+
+	"google.golang.org/api/sheets/v4"
 )
 
 // Sheet is a sheet in a spreadsheet.
@@ -47,10 +49,11 @@ func (sheet *Sheet) UnmarshalJSON(data []byte) error {
 					maxColumn = int(c)
 				}
 				cell := Cell{
-					Row:    r,
-					Column: c,
-					Value:  cellData.FormattedValue,
-					Note:   cellData.Note,
+					Row:               r,
+					Column:            c,
+					Value:             cellData.FormattedValue,
+					Note:              cellData.Note,
+					UserEnteredFormat: cellData.UserEnteredFormat,
 				}
 				cells = append(cells, cell)
 			}
@@ -127,6 +130,14 @@ func (sheet *Sheet) Update(row, column int, val string) {
 	sheet.updateCellField(row, column, func(c *Cell) string {
 		c.Value = val
 		return "userEnteredValue"
+	})
+}
+
+// UpdateColor updates a cell's color
+func (sheet *Sheet) UpdateColor(row, column int, color sheets.Color) {
+	sheet.updateCellField(row, column, func(c *Cell) string {
+		c.UserEnteredFormat = &sheets.CellFormat{BackgroundColor: &color}
+		return "userEnteredFormat"
 	})
 }
 
