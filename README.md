@@ -13,7 +13,8 @@ Any pull-request is welcome.
 ## Installation
 
 ```
-go get gopkg.in/Iwark/spreadsheet.v2
+go get github.com/triphop/spreadsheet
+
 ```
 
 ## Preparation
