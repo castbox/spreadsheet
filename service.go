@@ -113,7 +113,7 @@ func (s *Service) FetchSpreadsheet(ctx context.Context, id string, options ...Fe
 		return config.cachedSpreadsheet, nil
 	}
 
-	fields := "spreadsheetId,properties.title,sheets(properties,data.rowData.values(formattedValue,note))"
+	fields := "spreadsheetId,properties.title,sheets(properties,data.rowData.values(formattedValue,note,userEnteredFormat))"
 	fields = url.QueryEscape(fields)
 	path := fmt.Sprintf("/spreadsheets/%s?fields=%s", id, fields)
 	body, err := s.get(ctx, path)
