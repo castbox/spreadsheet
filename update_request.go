@@ -175,8 +175,14 @@ func (r *updateRequest) UpdateCells(sheet *Sheet) *updateRequest {
 		for _, field := range strings.Split(cell.modifiedFields, ",") {
 			switch field {
 			case "userEnteredValue":
-				values["userEnteredValue"] = map[string]string{
-					cellValueType(cell.Value): cell.Value,
+				if cell.ExplictValueType == "" {
+					values["userEnteredValue"] = map[string]string{
+						cellValueType(cell.Value): cell.Value,
+					}
+				} else {
+					values["userEnteredValue"] = map[string]string{
+						string(cell.ExplictValueType): cell.Value,
+					}
 				}
 			case "userEnteredFormat":
 				if cell.UserEnteredFormat != nil && cell.UserEnteredFormat.BackgroundColor != nil {

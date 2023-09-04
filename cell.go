@@ -6,11 +6,21 @@ import (
 	"google.golang.org/api/sheets/v4"
 )
 
+type CellValueType string
+
+const (
+	StringCellValue = "stringValue"
+	NumberCellValue = "numberValue"
+	BooleanCellValue = "boolValue"
+	FormulaCellValue = "formulaValue"
+)
+
 // Cell describes a cell data
 type Cell struct {
 	Row               uint
 	Column            uint
 	Value             string
+	ExplictValueType CellValueType
 	Note              string
 	UserEnteredFormat *sheets.CellFormat
 

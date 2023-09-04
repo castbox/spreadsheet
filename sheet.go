@@ -133,6 +133,14 @@ func (sheet *Sheet) Update(row, column int, val string) {
 	})
 }
 
+func (sheet *Sheet) UpdateWithValueType(row, column int, val string, valueType CellValueType) {
+	sheet.updateCellField(row, column, func(c *Cell) string {
+		c.Value = val
+		c.ExplictValueType = valueType
+		return "userEnteredValue"
+	})
+}
+
 // UpdateColor updates a cell's color
 func (sheet *Sheet) UpdateColor(row, column int, color sheets.Color) {
 	sheet.updateCellField(row, column, func(c *Cell) string {
