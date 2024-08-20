@@ -1,8 +1,8 @@
 package spreadsheet
 
 import (
-	"encoding/json"
 	"errors"
+	json "github.com/json-iterator/go"
 )
 
 // Spreadsheet represents a spreadsheet.

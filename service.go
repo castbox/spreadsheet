@@ -3,7 +3,6 @@ package spreadsheet
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -11,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	json "github.com/json-iterator/go"
 	"golang.org/x/oauth2/google"
 )
 

@@ -1,9 +1,9 @@
 package spreadsheet
 
 import (
-	"encoding/json"
 	"strings"
 
+	json "github.com/json-iterator/go"
 	"google.golang.org/api/sheets/v4"
 )
 

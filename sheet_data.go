@@ -1,6 +1,6 @@
 package spreadsheet
 
-import "encoding/json"
+import json "github.com/json-iterator/go"
 
 type sheetData struct {
 	GridData []GridData `json:"data"`
