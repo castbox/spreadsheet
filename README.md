@@ -13,7 +13,7 @@ Any pull-request is welcome.
 ## Installation
 
 ```
-go get github.com/triphop/spreadsheet
+go get github.com/castbox/spreadsheet
 
 ```
 

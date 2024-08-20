@@ -163,6 +163,16 @@ func (s *Service) AddSheet(ctx context.Context, spreadsheet *Spreadsheet, sheetP
 	return
 }
 
+// UpdateSheetProperties updates the sheet properties
+func (s *Service) UpdateSheetProperties(ctx context.Context, spreadsheet *Spreadsheet, sheet *Sheet, sheetProperties *SheetProperties) (err error) {
+	r, err := newUpdateRequest(spreadsheet)
+	newR := r.UpdateSheetProperties(sheet, sheetProperties)
+	if newR != nil {
+		return newR.Do()
+	}
+	return nil
+}
+
 // DuplicateSheet duplicates the contents of a sheet
 func (s *Service) DuplicateSheet(ctx context.Context, spreadsheet *Spreadsheet, sheet *Sheet, index int, title string) (err error) {
 	r, err := newUpdateRequest(spreadsheet)

@@ -121,6 +121,19 @@ func (suite *TestSuite) TestAdd_DeleteSheet() {
 	suite.Require().NoError(err)
 }
 
+func (suite *TestSuite) TestService_UpdateSheetProperties() {
+	spreadsheet, err := suite.service.FetchSpreadsheet(context.TODO(), spreadsheetID)
+	suite.Require().NoError(err)
+
+	sheet, err := spreadsheet.SheetByTitle("TestSheet")
+	suite.Require().NoError(err)
+
+	sheetProperties := sheet.Properties
+	sheetProperties.Title = "TestUpdatedSheet"
+	err = suite.service.UpdateSheetProperties(context.TODO(), spreadsheet, sheet, &sheetProperties)
+	suite.Require().NoError(err)
+}
+
 func (suite *TestSuite) TestSyncSheet() {
 	spreadsheet, err := suite.service.FetchSpreadsheet(context.TODO(), spreadsheetID)
 	suite.Require().NoError(err)
